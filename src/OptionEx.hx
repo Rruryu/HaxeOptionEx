@@ -5,11 +5,12 @@ import haxe.ds.Option;
 using OptionEx;
 
 @:nullSafety(Strict)
-class OptionEx {
-	static function CheckOption<T>(opt:Option<T>):Option<T> {
-		if (opt == null)
+abstract OptionEx<T>(Option<T>) from Option<T> {
+	public inline function CheckOption():Option<T> {
+		if (this == null)
+			//ログを仕込む?
 			return None;
-		switch (opt) {
+		switch (this) {
 			case Some((v)):
 				if (v != null)
 					return Some(v)
@@ -20,49 +21,34 @@ class OptionEx {
 		}
 	}
 
-	public static function isEmpty<T>(opt:Option<T>) {
-		opt = CheckOption(opt);
-		return switch (opt) {
+	public inline function isEmpty() {
+		CheckOption();
+		return switch (this) {
 			case Some(v): false;
 			case None: true;
 		}
 	}
 
-    //orのdefValueがnullだった場合防げないし、どこでnullだったか分かりづらい
-	public static function or<T>(opt:Option<T>, defValue:T) {
-		opt = CheckOption(opt);
-
-		NullCheckMacro.NullCheck(defValue);
-		return switch (opt) {
+	//プリミティブ型以外は非推奨
+	public inline function or(defValue:T) {
+		CheckOption();
+		return switch (this) {
 			case Some(v): v;
 			case None: defValue;
 		}
 	}
-	// public static function Or<T>(opt:Option<T>, defValue:T) {
-    //     opt=CheckOption(opt);
-    //     trace(Context.currentPos.file);
-    //     return switch (opt){
-    //         case Some(v): v;
-    //         case None:defValue;
-    //     }
-    // }
 
-	public static function map<A, B>(opt:Option<A>, f:A->B) {
-		opt = CheckOption(opt);
-		return switch (opt) {
+	public inline function map<U>(f:T->U) {
+		CheckOption();
+		return switch (this) {
 			case Some(v): Some(f(v));
 			case None: None;
 		}
 	}
 
-	public static function fold<A, B>(opt:Option<A>, defValue:B, f:A->B) {
-		opt = CheckOption(opt);
-		return opt.map(f).or(defValue);
-	}
-
-	public static function iter<A>(opt:Option<A>, f:A->Void) {
-		opt = CheckOption(opt);
-		switch (opt) {
+	public inline function iter(f:T->Void) {
+		CheckOption();
+		switch (this) {
 			case Some(v):
 				f(v);
 			case None:
@@ -70,17 +56,10 @@ class OptionEx {
 		}
 	}
 
-	public static function flatten<T>(opt:Option<Option<T>>) {
-		opt = CheckOption(opt);
-		return switch (opt) {
-			case Some(v): v;
-			case None: None;
-		}
-	}
 
-	public static function flatMap<A, B>(opt:Option<A>, f:A->Option<B>) {
-		opt = CheckOption(opt);
-		return switch (opt) {
+	public inline function flatMap<U>( f:T->Option<U>) {
+		CheckOption();
+		return switch (this) {
 			case Some(v):
 				switch (f(v)) {
 					case Some(w): Some(w);
