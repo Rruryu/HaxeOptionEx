@@ -1,14 +1,12 @@
-package;
+package optionex;
 
 import haxe.ds.Option;
-
-using OptionEx;
 
 @:nullSafety(Strict)
 abstract OptionEx<T>(Option<T>) from Option<T> {
 	public inline function CheckOption():Option<T> {
 		if (this == null)
-			//ログを仕込む?
+			// ログを仕込む?
 			return None;
 		switch (this) {
 			case Some((v)):
@@ -29,7 +27,7 @@ abstract OptionEx<T>(Option<T>) from Option<T> {
 		}
 	}
 
-	//プリミティブ型以外は非推奨
+	// プリミティブ型以外は非推奨
 	public inline function or(defValue:T) {
 		CheckOption();
 		return switch (this) {
@@ -56,8 +54,7 @@ abstract OptionEx<T>(Option<T>) from Option<T> {
 		}
 	}
 
-
-	public inline function flatMap<U>( f:T->Option<U>) {
+	public inline function flatMap<U>(f:T->Option<U>) {
 		CheckOption();
 		return switch (this) {
 			case Some(v):
